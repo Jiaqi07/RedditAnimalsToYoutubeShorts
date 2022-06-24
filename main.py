@@ -1,8 +1,6 @@
 import praw
-from moviepy.video.tools.subtitles import SubtitlesClip
 from redvid import Downloader
 import moviepy.editor as mp
-import cv2
 import os
 import datetime
 from Google import Create_Service
@@ -16,7 +14,7 @@ redditYoutube = []
 i = 1
 
 for submission in r.subreddit("aww").top(time_filter="day"):
-    if submission.is_video and submission.score > 11000 and submission.media["reddit_video"]["duration"] < 60:
+    if submission.is_video and submission.score > 4000 and submission.media["reddit_video"]["duration"] < 60:
         print(str(submission.title) + ': ' + str(submission))
 
         reddit.url = submission.url
@@ -43,13 +41,13 @@ for video in redditYoutube:
 
     service = Create_Service(CLIENT_SECRET_FILE, API_NAME, API_VERSION, SCOPES)
 
-    upload_date_time = datetime.datetime(2022, 6, 24, 15+time, 0, 0).isoformat() + '.000Z'
+    upload_date_time = datetime.datetime(2022, 6, 25, 15+time, 0, 0).isoformat() + '.000Z'
     time += 1
     request_body = {
         'snippet': {
             'categoryI': 15,
             'title': str(video.title) + ' #shorts',
-            'description': str(video.url) + '\nHope you enjoy and consider dropping a like, comment, and a sub!\nAll clips '
+            'description': 'Source: ' + str(video.url) + '\nHope you enjoy and consider dropping a like, comment, and a sub!\nAll clips '
                                        'are taken from reddit!',
             'tags': ['Cat', 'Animal', 'Memes', 'Cute', 'Funny', 'Happy', 'Dogs', 'Zoo','Nature', 'Game', 'Furry', 'Pets', 'Love', 'Chill', 'Human', 'Family', 'Minecraft', 'Reddit', 'Subscribe']
         },
@@ -58,12 +56,10 @@ for video in redditYoutube:
             'publishAt': upload_date_time,
             'selfDeclaredMadeForKids': False,
         },
-        'notifySubscribers': False
+        'notifySubscribers': True
     }
 
-    mediaFile = MediaFileUpload('Clip ' + str(i - 1) + '.mp4')
-    os.remove('Clip ' + str(i - 1) + '.mp4')
-    i += 1
+    mediaFile = MediaFileUpload('Clip ' + str(i) + '.mp4')
 
     response_upload = service.videos().insert(
         part='snippet,status',
@@ -71,6 +67,5 @@ for video in redditYoutube:
         media_body=mediaFile
     ).execute()
 
-
-# for x in redditDelete:
-#     os.remove(x)
+    os.remove('Clip ' + str(i) + '.mp4')
+    i += 1
