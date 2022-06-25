@@ -22,7 +22,7 @@ for submission in r.subreddit("aww").top(time_filter="day"):
         reddit.download()
 
         clip = mp.VideoFileClip(reddit.file_name)
-        rclip = clip.resize((1080, 1920))  # convert to youtube shorts format
+        rclip = clip.resize((1080, 1920))  # convert to YouTube shorts format
         rclip.write_videofile('Clip ' + str(i) + '.mp4')
 
         os.remove(str(reddit.file_name))
@@ -30,6 +30,22 @@ for submission in r.subreddit("aww").top(time_filter="day"):
         i += 1
         redditYoutube.append(submission)
 
+for submission in r.subreddit("AnimalsBeingDerps").top(time_filter="day"):
+    if submission.is_video and submission.score > 4000 and submission.media["reddit_video"]["duration"] < 60:
+        print(str(submission.title) + ': ' + str(submission))
+
+        reddit.url = submission.url
+        reddit.max = True
+        reddit.download()
+
+        clip = mp.VideoFileClip(reddit.file_name)
+        rclip = clip.resize((1080, 1920))  # convert to YouTube shorts format
+        rclip.write_videofile('Clip ' + str(i) + '.mp4')
+
+        os.remove(str(reddit.file_name))
+
+        i += 1
+        redditYoutube.append(submission)
 
 time, i = (0, 1)
 for video in redditYoutube:
@@ -41,7 +57,7 @@ for video in redditYoutube:
 
     service = Create_Service(CLIENT_SECRET_FILE, API_NAME, API_VERSION, SCOPES)
 
-    upload_date_time = datetime.datetime(2022, 6, 25, 15+time, 0, 0).isoformat() + '.000Z'
+    upload_date_time = datetime.datetime(2022, 6, 25, 21+time, 0, 0).isoformat() + '.000Z' #15 = 10am, 21 = 4pm
     time += 1
     request_body = {
         'snippet': {
@@ -67,5 +83,4 @@ for video in redditYoutube:
         media_body=mediaFile
     ).execute()
 
-    os.remove('Clip ' + str(i) + '.mp4')
     i += 1
