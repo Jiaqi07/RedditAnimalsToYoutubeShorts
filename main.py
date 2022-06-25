@@ -6,11 +6,7 @@ import datetime
 from Google import Create_Service
 from googleapiclient.http import MediaFileUpload
 
-<<<<<<< HEAD
 r = praw.Reddit(client_id="-", client_secret="-",
-=======
-r = praw.Reddit(client_id="---", client_secret="----",
->>>>>>> origin/master
                 user_agent="Jiaqi07")
 
 reddit = Downloader(max_q=True)
@@ -87,9 +83,4 @@ for video in redditYoutube:
         media_body=mediaFile
     ).execute()
 
-<<<<<<< HEAD
     i += 1
-=======
-    os.remove('Clip ' + str(i) + '.mp4')
-    i += 1
->>>>>>> origin/master
