@@ -1,3 +1,4 @@
+import re
 import praw
 from redvid import Downloader
 import moviepy.editor as mp
@@ -31,7 +32,24 @@ for submission in r.subreddit("aww").top(time_filter="day"):
         redditYoutube.append(submission)
 
 for submission in r.subreddit("AnimalsBeingDerps").top(time_filter="day"):
-    if submission.is_video and submission.score > 4000 and submission.media["reddit_video"]["duration"] < 60:
+    if submission.is_video and submission.score > 5000 and submission.media["reddit_video"]["duration"] < 60:
+        print(str(submission.title) + ': ' + str(submission))
+
+        reddit.url = submission.url
+        reddit.max = True
+        reddit.download()
+
+        clip = mp.VideoFileClip(reddit.file_name)
+        rclip = clip.resize((1080, 1920))  # convert to YouTube shorts format
+        rclip.write_videofile('Clip ' + str(i) + '.mp4')
+
+        os.remove(str(reddit.file_name))
+
+        i += 1
+        redditYoutube.append(submission)
+
+for submission in r.subreddit("cats").top(time_filter="day"):
+    if submission.is_video and submission.score > 7500 and submission.media["reddit_video"]["duration"] < 60:
         print(str(submission.title) + ': ' + str(submission))
 
         reddit.url = submission.url
@@ -49,7 +67,6 @@ for submission in r.subreddit("AnimalsBeingDerps").top(time_filter="day"):
 
 time, i = (0, 1)
 for video in redditYoutube:
-    # YOUTUBE UPLOADER
     CLIENT_SECRET_FILE = 'ClientSecretFile.json'
     API_NAME = 'youtube'
     API_VERSION = 'v3'
@@ -57,15 +74,21 @@ for video in redditYoutube:
 
     service = Create_Service(CLIENT_SECRET_FILE, API_NAME, API_VERSION, SCOPES)
 
-    upload_date_time = datetime.datetime(2022, 6, 25, 21+time, 0, 0).isoformat() + '.000Z' #15 = 10am, 21 = 4pm
+    upload_date_time = datetime.datetime(2022, 6, 28, 15 + time, 0, 0).isoformat() + '.000Z'  # 15 = 10am, 21 = 4pm
     time += 1
+
+    s = str(video.title)
+    title = re.sub("[^0-9a-zA-Z]+", "", s)
+
     request_body = {
         'snippet': {
             'categoryI': 15,
-            'title': str(video.title) + ' #shorts',
-            'description': 'Source: ' + str(video.url) + '\nHope you enjoy and consider dropping a like, comment, and a sub!\nAll clips '
-                                       'are taken from reddit!',
-            'tags': ['Cat', 'Animal', 'Memes', 'Cute', 'Funny', 'Happy', 'Dogs', 'Zoo','Nature', 'Game', 'Furry', 'Pets', 'Love', 'Chill', 'Human', 'Family', 'Minecraft', 'Reddit', 'Subscribe']
+            'title': title + ' #shorts',
+            'description': 'Source: ' + str(
+                video.url) + '\nHope you enjoy and consider dropping a like, comment, and a sub!\nAll clips '
+                             'are taken from reddit!',
+            'tags': ['Cat', 'Animal', 'Memes', 'Cute', 'Funny', 'Happy', 'Dogs', 'Zoo', 'Nature', 'Game', 'Furry',
+                     'Pets', 'Love', 'Chill', 'Human', 'Family', 'Minecraft', 'Reddit', 'Subscribe']
         },
         'status': {
             'privacyStatus': 'private',
@@ -83,4 +106,9 @@ for video in redditYoutube:
         media_body=mediaFile
     ).execute()
 
+    i += 1
+
+i = 1
+for x in redditYoutube:
+    os.remove('Clip ' + str(i) + '.mp4')
     i += 1
